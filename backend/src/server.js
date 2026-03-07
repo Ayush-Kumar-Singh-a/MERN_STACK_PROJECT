@@ -7,6 +7,14 @@ const app = express();
 
 const __dirname = path.resolve();
 
+if(ENV.NODE_ENV !== "production"){
+    app.use(
+        cors({
+            origin: "http://localhost:5173",
+        })
+    );
+}
+
 app.get("/health", (req,res) =>{
     res.status(200).json({msg:"API is up and running"})
 })
