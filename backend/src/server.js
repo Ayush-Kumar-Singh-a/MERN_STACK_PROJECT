@@ -1,19 +1,21 @@
 import express from "express";
 import path from "path";
+// import cors from "cors";
 
-import {ENV} from "./lib/env.js";
+import { ENV } from "./lib/env.js";
+import { connectDB } from "./lib/db.js";
 
 const app = express();
 
 const __dirname = path.resolve();
 
-if(ENV.NODE_ENV !== "production"){
-    app.use(
-        cors({
-            origin: "http://localhost:5173",
-        })
-    );
-}
+// if(ENV.NODE_ENV !== "production"){
+//     app.use(
+//         cors({
+//             origin: "http://localhost:5173",
+//         })
+//     );
+// }
 
 app.get("/health", (req,res) =>{
     res.status(200).json({msg:"API is up and running"})
@@ -22,7 +24,7 @@ app.get("/health", (req,res) =>{
 app.get("/books",(req,res)=>{
     res.status(200).json({msg: "this is the books endpoint"})
 });
-//make our app ready for deployment
+//making my app ready for deployment
 if(ENV.NODE_ENV === "production"){
     app.use(express.static(path.join(__dirname,"../frontend/dist")))
 
@@ -30,6 +32,18 @@ if(ENV.NODE_ENV === "production"){
         res.sendFile(path.join(__dirname,"../frontend","dist","index.html"));
     });
 }
-app.listen(ENV.PORT,()=>{
-    console.log(`Server is running on`,ENV.PORT)
-})
+
+
+const startServer = async() => {
+    try {
+        await connectDB();
+        app.listen(ENV.PORT,()=>{
+        console.log(`Server is running on`,ENV.PORT);
+    })
+    } catch (error) {
+        console.error("Error starting the server", error);
+        process.exit(1);
+    }
+};
+
+startServer();
