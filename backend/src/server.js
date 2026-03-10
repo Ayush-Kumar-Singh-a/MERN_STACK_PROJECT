@@ -42,6 +42,7 @@ const startServer = async() => {
     })
     } catch (error) {
         console.error("Error starting the server", error);
+        process.exit(1);
     }
 };
 
